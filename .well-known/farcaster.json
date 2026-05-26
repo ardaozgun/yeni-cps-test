@@ -7,11 +7,11 @@
   "frame": {
     "version": "1",
     "name": "CPS Test",
-    "iconUrl": "https://yeni-cps-test.vercel.app/icon.png",
+    "iconUrl": "https://placehold.co/200x200/0052FF/white?text=CPS",
     "homeUrl": "https://yeni-cps-test.vercel.app",
-    "imageUrl": "https://yeni-cps-test.vercel.app",
+    "imageUrl": "https://placehold.co/800x600/0052FF/white?text=CPS+Test",
     "buttonTitle": "Oyna",
-    "splashImageUrl": "https://yeni-cps-test.vercel.app",
+    "splashImageUrl": "https://placehold.co/200x200/0052FF/white?text=CPS",
     "splashBackgroundColor": "#0052FF"
   }
 }
