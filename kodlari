@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPS Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #0052FF; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .card { background: white; border-radius: 20px; padding: 32px 24px; width: 340px; text-align: center; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #888; font-size: 14px; margin-bottom: 24px; }
+  #click-btn { width: 100%; height: 160px; border-radius: 16px; border: 2px solid #0052FF; background: #f0f4ff; font-size: 20px; font-weight: 600; color: #0052FF; cursor: pointer; }
+  #click-btn:active { background: #dde8ff; transform: scale(0.97); }
+  #click-btn.done { cursor: default; background: #f5f5f5; border-color: #ccc; color: #999; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .stat { background: #f5f5f5; border-radius: 10px; padding: 12px 6px; }
+  .stat-label { font-size: 11px; color: #999; margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #111; }
+  .bar-bg { height: 8px; background: #eee; border-radius: 99px; margin-bottom: 12px; }
+  .bar-fill { height: 100%; width: 0%; background: #0052FF; border-radius: 99px; transition: width 0.1s; }
+  .rating { font-size: 15px; color: #444; min-height: 22px; margin-bottom: 12px; }
+  #reset-btn { display: none; width: 100%; padding: 12px; border-radius: 10px; border: none; background: #0052FF; color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .history { margin-top: 14px; display: none; }
+  .history-label { font-size: 12px; color: #aaa; margin-bottom: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .chip { font-size: 12px; padding: 4px 10px; border-radius: 99px; background: #f0f4ff; color: #0052FF; border: 1px solid #c7d8ff; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>CPS Test</h1>
+  <p class="sub">10 saniyede kaç kez tıklayabilirsin?</p>
+
+  <button id="click-btn">Tıklamaya başla</button>
+
+  <div class="bar-bg" style="margin-top:14px"><div class="bar-fill" id="bar"></div></div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Tıklama</div><div class="stat-value" id="clicks">0</div></div>
+    <div class="stat"><div class="stat-label">CPS</div><div class="stat-value" id="cps">0.0</div></div>
+    <div class="stat"><div class="stat-label">Süre</div><div class="stat-value" id="timer">10</div></div>
+  </div>
+
+  <div class="rating" id="rating"></div>
+  <button id="reset-btn">Tekrar dene</button>
+
+  <div class="history" id="history">
+    <div class="history-label">Geçmiş</div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<script>
+  const btn = document.getElementById('click-btn');
+  const bar = document.getElementById('bar');
+  const clicksEl = document.getElementById('clicks');
+  const cpsEl = document.getElementById('cps');
+  const timerEl = document.getElementById('timer');
+  const ratingEl = document.getElementById('rating');
+  const resetBtn = document.getElementById('reset-btn');
+  const historyDiv = document.getElementById('history');
+  const chips = document.getElementById('chips');
+
+  let clicks=0, started=false, finished=false, startTime=null, iv=null, history=[];
+
+  function rate(c){
+    if(c>=14) return '🏆 Efsane!';
+    if(c>=10) return '🔥 Çok hızlı!';
+    if(c>=8)  return '⚡ İyi!';
+    if(c>=6)  return '👍 Ortalama';
+    if(c>=4)  return '🐢 Biraz yavaş';
+    return '😅 Isın biraz!';
+  }
+
+  function finish(){
+    if(finished) return;
+    finished=true; clearInterval(iv);
+    const cps=(clicks/10);
+    cpsEl.textContent=cps.toFixed(1);
+    timerEl.textContent='0.0';
+    bar.style.width='100%';
+    btn.textContent='Bitti!'; btn.classList.add('done');
+    ratingEl.textContent=rate(cps);
+    resetBtn.style.display='block';
+    history.unshift(cps.toFixed(1));
+    if(history.length>6) history=history.slice(0,6);
+    chips.innerHTML=history.map((v,i)=>`<span class="chip">#${i+1} — ${v}</span>`).join('');
+    historyDiv.style.display='block';
+  }
+
+  function handleClick(e){
+    e.preventDefault();
+    if(finished) return;
+    if(!started){
+      started=true; startTime=Date.now();
+      btn.textContent='Tıkla!';
+      iv=setInterval(()=>{
+        const el=(Date.now()-startTime)/1000;
+        const rem=Math.max(0,10-el);
+        timerEl.textContent=rem.toFixed(1);
+        bar.style.width=Math.min(100,(el/10)*100).toFixed(1)+'%';
+        cpsEl.textContent=(clicks/el).toFixed(1);
+        if(el>=10) finish();
+      },50);
+    }
+    clicks++;
+    clicksEl.textContent=clicks;
+  }
+
+  function reset(){
+    clicks=0; started=false; finished=false; startTime=null;
+    clearInterval(iv);
+    clicksEl.textContent='0'; cpsEl.textContent='0.0'; timerEl.textContent='10';
+    bar.style.width='0%'; ratingEl.textContent='';
+    btn.textContent='Tıklamaya başla'; btn.className='';
+    resetBtn.style.display='none';
+  }
+
+  btn.addEventListener('click', handleClick);
+  btn.addEventListener('touchstart', handleClick, {passive:false});
+  resetBtn.addEventListener('click', reset);
+</script>
+</body>
+</html>
