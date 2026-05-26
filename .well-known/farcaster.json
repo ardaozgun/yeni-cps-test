@@ -1,0 +1,17 @@
+{
+  "accountAssociation": {
+    "header": "placeholder",
+    "payload": "placeholder",
+    "signature": "placeholder"
+  },
+  "frame": {
+    "version": "1",
+    "name": "CPS Test",
+    "iconUrl": "https://yeni-cps-test.vercel.app/icon.png",
+    "homeUrl": "https://yeni-cps-test.vercel.app",
+    "imageUrl": "https://yeni-cps-test.vercel.app",
+    "buttonTitle": "Oyna",
+    "splashImageUrl": "https://yeni-cps-test.vercel.app",
+    "splashBackgroundColor": "#0052FF"
+  }
+}
